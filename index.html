@@ -6,6 +6,8 @@
     <title>Executive Teacher ID Creator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Added jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -139,11 +141,12 @@
                         </svg>
                         Regenerate Meta Details
                     </button>
-                    <button id="downloadBtn" onclick="exportToPng()" class="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-bold shadow-lg shadow-emerald-200 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <!-- Updated to Download as PDF -->
+                    <button id="downloadBtn" onclick="exportToPdf()" class="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-bold shadow-lg shadow-indigo-200 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                         <svg id="downloadIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
-                        <span id="btnText">Download as PNG</span>
+                        <span id="btnText">Download as PDF</span>
                     </button>
                 </div>
             </div>
@@ -256,51 +259,54 @@
             document.getElementById('prevBlood').innerText = randomBlood;
         }
 
-        async function exportToPng() {
+        async function exportToPdf() {
             const btn = document.getElementById('downloadBtn');
             const btnText = document.getElementById('btnText');
             const originalText = btnText.innerText;
             
             btn.disabled = true;
-            btnText.innerText = "Processing...";
+            btnText.innerText = "Creating PDF...";
 
             try {
-                // Ensure the font and all images are loaded
+                // Ensure fonts and images are loaded
                 await document.fonts.ready;
                 
-                const element = document.getElementById('captureArea');
+                const element = document.getElementById('mainCard');
                 
-                // Using scale 4 for ultra-sharp result
+                // Capture the card with high resolution
                 const canvas = await html2canvas(element, {
-                    scale: 4,
-                    backgroundColor: null,
+                    scale: 3, // Balanced for quality vs size on mobile
+                    backgroundColor: "#ffffff",
                     useCORS: true,
-                    logging: false,
-                    onclone: (clonedDoc) => {
-                        // Optional: Adjust styles in clone if needed
-                        clonedDoc.getElementById('captureArea').style.padding = "0";
-                    }
+                    logging: false
                 });
 
-                const dataUrl = canvas.toDataURL('image/png');
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                
+                // Initialize jsPDF
+                const { jsPDF } = window.jspdf;
+                // Standard ID Card Size: 85.6mm x 53.98mm
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: [54, 85.6] // Fits the ID card exactly
+                });
+
+                // Add the captured image to the PDF (coordinates 0,0)
+                pdf.addImage(imgData, 'JPEG', 0, 0, 85.6, 54);
+                
                 const teacherName = document.getElementById('prevTeacherName').innerText.trim().replace(/\s+/g, '_');
+                pdf.save(`Teacher_ID_${teacherName || 'Card'}.pdf`);
                 
-                const link = document.createElement('a');
-                link.setAttribute('href', dataUrl);
-                link.setAttribute('download', `Teacher_ID_${teacherName || 'Card'}.png`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                btnText.innerText = "Success!";
+                btnText.innerText = "Done!";
                 setTimeout(() => {
                     btnText.innerText = originalText;
                     btn.disabled = false;
                 }, 2000);
 
             } catch (err) {
-                console.error("PNG Generation Error:", err);
-                btnText.innerText = "Error!";
+                console.error("PDF Generation Error:", err);
+                btnText.innerText = "Failed";
                 setTimeout(() => {
                     btnText.innerText = originalText;
                     btn.disabled = false;
