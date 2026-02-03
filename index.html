@@ -18,7 +18,6 @@
             font-family: 'Inter', sans-serif;
             background-color: #f1f5f9;
         }
-        /* The Professional ID Card Styling */
         .id-card-modern {
             width: var(--card-width);
             height: var(--card-height);
@@ -111,7 +110,6 @@
             </header>
 
             <div class="space-y-6">
-                <!-- File Inputs -->
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <label class="text-sm font-bold text-slate-700">School Logo</label>
@@ -123,7 +121,6 @@
                     </div>
                 </div>
 
-                <!-- Text Inputs -->
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Institution Name</label>
@@ -135,7 +132,6 @@
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
                 <div class="flex flex-col gap-3 pt-4">
                     <button onclick="refreshData()" class="group flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white py-4 rounded-2xl font-bold transition-all transform active:scale-95">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -143,11 +139,11 @@
                         </svg>
                         Regenerate Meta Details
                     </button>
-                    <button onclick="exportToJpeg()" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-200 transition-all transform active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button id="downloadBtn" onclick="exportToPng()" class="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-bold shadow-lg shadow-emerald-200 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg id="downloadIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
-                        Export as High-Res JPEG
+                        <span id="btnText">Download as PNG</span>
                     </button>
                 </div>
             </div>
@@ -159,20 +155,15 @@
             
             <div id="captureArea">
                 <div id="mainCard" class="id-card-modern">
-                    <!-- Top Section -->
                     <div class="card-top-accent flex flex-col items-center pt-8 px-6 text-center">
                         <div class="card-bg-pattern"></div>
-                        
-                        <!-- School Logo Space -->
                         <div class="absolute top-6 right-6 w-12 h-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center overflow-hidden p-2 border border-white/20">
                             <img id="prevSchoolLogo" src="" class="hidden max-w-full max-h-full object-contain">
                             <svg id="defSchoolIcon" class="w-6 h-6 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                         </div>
-
                         <h2 id="prevSchoolName" class="text-white text-sm font-extrabold uppercase tracking-widest leading-tight mt-2 opacity-90">Your Institution Name</h2>
                     </div>
 
-                    <!-- Profile Area -->
                     <div class="profile-hex-wrap">
                         <div class="profile-img-container">
                             <img id="prevTeacherPhoto" src="" class="hidden">
@@ -182,16 +173,12 @@
                         </div>
                     </div>
 
-                    <!-- Card Body -->
                     <div class="px-8 pt-4">
                         <div class="text-center mb-6">
                             <h3 id="prevTeacherName" class="text-2xl font-extrabold text-slate-900 leading-none mb-2">Teacher Name</h3>
                             <div class="inline-block px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-wider" id="prevSubject">Mathematics Faculty</div>
                         </div>
-
                         <div class="chip-mockup"><div class="chip-lines"></div></div>
-
-                        <!-- Data Grid -->
                         <div class="grid grid-cols-2 gap-y-6 gap-x-4 mt-8">
                             <div>
                                 <p class="label-text">Employee ID</p>
@@ -206,7 +193,6 @@
                                 <p class="value-text">Dec 2030</p>
                             </div>
                             <div class="flex justify-end items-end">
-                                <!-- Minimal QR Code Mockup -->
                                 <div class="w-12 h-12 bg-slate-100 p-1 rounded-md border border-slate-200">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400">
                                         <path d="M3 3h4v4H3V3zM17 3h4v4h-4V3zM3 17h4v4H3v-4zM14 14h2v2h-2v-2zM18 18h2v2h-2v-2zM14 18h2v2h-2v-2zM18 14h2v2h-2v-2z" />
@@ -216,7 +202,6 @@
                         </div>
                     </div>
 
-                    <!-- Bottom Bar -->
                     <div class="absolute bottom-0 w-full py-4 bg-slate-50 border-t border-slate-100 px-8 flex justify-between items-center">
                         <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Digital Authentication System</span>
                         <div class="flex gap-1">
@@ -235,7 +220,6 @@
         const subjectPool = ["Natural Sciences", "Advanced Mathematics", "English Literature", "Physical Education", "Fine Arts", "World History", "Computer Engineering", "Global Economics", "Applied Physics", "Chemistry"];
         const bloodPool = ["A+ (Positive)", "B+ (Positive)", "AB+ (Positive)", "O+ (Positive)", "A- (Negative)", "B- (Negative)", "O- (Negative)"];
 
-        // Image Processing
         function handleImage(inputId, displayId, fallbackId) {
             document.getElementById(inputId).addEventListener('change', function(e) {
                 const file = e.target.files[0];
@@ -255,7 +239,6 @@
         handleImage('schoolLogoIn', 'prevSchoolLogo', 'defSchoolIcon');
         handleImage('teacherPhotoIn', 'prevTeacherPhoto', 'defUserIcon');
 
-        // Text Updates
         document.getElementById('schoolNameIn').addEventListener('input', e => {
             document.getElementById('prevSchoolName').innerText = e.target.value || "Your Institution Name";
         });
@@ -263,7 +246,6 @@
             document.getElementById('prevTeacherName').innerText = e.target.value || "Teacher Name";
         });
 
-        // Data Generation
         function refreshData() {
             const randomID = "EDU-" + Math.floor(100000 + Math.random() * 900000);
             const randomSub = subjectPool[Math.floor(Math.random() * subjectPool.length)];
@@ -274,36 +256,58 @@
             document.getElementById('prevBlood').innerText = randomBlood;
         }
 
-        async function exportToJpeg() {
-            const btn = event.currentTarget;
-            const original = btn.innerHTML;
-            btn.innerHTML = "Generating Image...";
+        async function exportToPng() {
+            const btn = document.getElementById('downloadBtn');
+            const btnText = document.getElementById('btnText');
+            const originalText = btnText.innerText;
+            
             btn.disabled = true;
+            btnText.innerText = "Processing...";
 
             try {
+                // Ensure the font and all images are loaded
+                await document.fonts.ready;
+                
                 const element = document.getElementById('captureArea');
+                
+                // Using scale 4 for ultra-sharp result
                 const canvas = await html2canvas(element, {
-                    scale: 4, // 4x for crystal clear print quality
+                    scale: 4,
                     backgroundColor: null,
                     useCORS: true,
-                    allowTaint: true
+                    logging: false,
+                    onclone: (clonedDoc) => {
+                        // Optional: Adjust styles in clone if needed
+                        clonedDoc.getElementById('captureArea').style.padding = "0";
+                    }
                 });
 
-                const name = document.getElementById('prevTeacherName').innerText.replace(/\s+/g, '_');
+                const dataUrl = canvas.toDataURL('image/png');
+                const teacherName = document.getElementById('prevTeacherName').innerText.trim().replace(/\s+/g, '_');
+                
                 const link = document.createElement('a');
-                link.download = `ID_CARD_${name}.jpg`;
-                link.href = canvas.toDataURL('image/jpeg', 0.98);
+                link.setAttribute('href', dataUrl);
+                link.setAttribute('download', `Teacher_ID_${teacherName || 'Card'}.png`);
+                document.body.appendChild(link);
                 link.click();
+                document.body.removeChild(link);
+                
+                btnText.innerText = "Success!";
+                setTimeout(() => {
+                    btnText.innerText = originalText;
+                    btn.disabled = false;
+                }, 2000);
+
             } catch (err) {
-                console.error(err);
-                alert("Capture failed. Ensure images are fully loaded.");
-            } finally {
-                btn.innerHTML = original;
-                btn.disabled = false;
+                console.error("PNG Generation Error:", err);
+                btnText.innerText = "Error!";
+                setTimeout(() => {
+                    btnText.innerText = originalText;
+                    btn.disabled = false;
+                }, 3000);
             }
         }
 
-        // Initialize
         window.onload = refreshData;
     </script>
 </body>
