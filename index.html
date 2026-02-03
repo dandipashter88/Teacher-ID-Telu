@@ -1,321 +1,282 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executive Teacher ID Creator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Added jsPDF for PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --card-width: 350px;
-            --card-height: 540px;
-            --primary-navy: #0f172a;
-            --accent-blue: #3b82f6;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9;
-        }
-        .id-card-modern {
-            width: var(--card-width);
-            height: var(--card-height);
-            background: white;
-            border-radius: 24px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        .card-top-accent {
-            height: 160px;
-            background: var(--primary-navy);
-            position: relative;
-            clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
-        }
-        .card-bg-pattern {
-            position: absolute;
-            inset: 0;
-            opacity: 0.1;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6zM36 4V0h-2v4h-4v2h4v4h2V6h4V4h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-        .profile-hex-wrap {
-            width: 150px;
-            height: 150px;
-            margin: -85px auto 0;
-            position: relative;
-            z-index: 20;
-        }
-        .profile-img-container {
-            width: 100%;
-            height: 100%;
-            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            background: #e2e8f0;
-            border: 6px solid white;
-            overflow: hidden;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-        .profile-img-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .chip-mockup {
-            width: 38px;
-            height: 30px;
-            background: linear-gradient(135deg, #d4af37 0%, #f9e29c 50%, #b8860b 100%);
-            border-radius: 6px;
-            position: absolute;
-            top: 180px;
-            left: 25px;
-            opacity: 0.8;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-        .chip-lines {
-            width: 100%;
-            height: 100%;
-            border: 1px solid rgba(0,0,0,0.2);
-            border-radius: 6px;
-            background-image: linear-gradient(90deg, transparent 50%, rgba(0,0,0,0.1) 50%), linear-gradient(0deg, transparent 50%, rgba(0,0,0,0.1) 50%);
-            background-size: 10px 10px;
-        }
-        .label-text {
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #94a3b8;
-        }
-        .value-text {
-            font-size: 13px;
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .mono-id {
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--accent-blue);
-        }
-    </style>
-</head>
-<body class="py-12 px-4">
+import React, { useState, useRef, useEffect } from 'react';
+import { Download, RefreshCw, Upload, School, User, Hash, Droplets, BookOpen, Calendar, Image as ImageIcon } from 'lucide-react';
 
-    <div class="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-start">
-        
-        <!-- Controls Section -->
-        <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-200">
-            <header class="mb-8">
-                <h1 class="text-3xl font-black text-slate-900 tracking-tight">ID Generator</h1>
-                <p class="text-slate-500 font-medium">Create professional teacher credentials instantly.</p>
-            </header>
+const App = () => {
+  const [schoolName, setSchoolName] = useState('Greenwood High School');
+  const [fullName, setFullName] = useState('John Doe');
+  const [logo, setLogo] = useState(null);
+  const [teacherPhoto, setTeacherPhoto] = useState(null);
+  const [idDetails, setIdDetails] = useState({
+    idNumber: 'TCH-2024-8842',
+    subject: 'Mathematics',
+    bloodGroup: 'O+',
+  });
+  const cardRef = useRef(null);
 
-            <div class="space-y-6">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-sm font-bold text-slate-700">School Logo</label>
-                        <input type="file" id="schoolLogoIn" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all cursor-pointer">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-sm font-bold text-slate-700">Teacher Photo</label>
-                        <input type="file" id="teacherPhotoIn" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all cursor-pointer">
-                    </div>
+  const subjects = [
+    'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English Literature', 
+    'History', 'Geography', 'Computer Science', 'Art & Design', 'Physical Education'
+  ];
+  const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
+  const generateRandomDetails = () => {
+    const randomId = `TCH-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const randomSubject = subjects[Math.floor(Math.random() * subjects.length)];
+    const randomBlood = bloodGroups[Math.floor(Math.random() * bloodGroups.length)];
+    
+    setIdDetails({
+      idNumber: randomId,
+      subject: randomSubject,
+      bloodGroup: randomBlood
+    });
+  };
+
+  useEffect(() => {
+    generateRandomDetails();
+  }, []);
+
+  const handleFileUpload = (e, setter) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setter(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const downloadIDCard = async () => {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    document.body.appendChild(script);
+
+    script.onload = () => {
+      window.html2canvas(cardRef.current, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: null,
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `Teacher_ID_${fullName.replace(/\s+/g, '_')}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        document.body.removeChild(script);
+      });
+    };
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-900">
+      <div className="max-w-6xl mx-auto">
+        <header className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-indigo-900 mb-2">Teacher ID Generator</h1>
+          <p className="text-slate-600">Generate professional, print-ready identification cards</p>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+          
+          {/* Form Section */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-indigo-700">
+              <User className="w-5 h-5" />
+              Configuration
+            </h2>
+
+            <div className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">School Name</label>
+                  <div className="relative">
+                    <School className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input 
+                      type="text" 
+                      value={schoolName}
+                      onChange={(e) => setSchoolName(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      placeholder="School Name"
+                    />
+                  </div>
                 </div>
 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Institution Name</label>
-                        <input type="text" id="schoolNameIn" placeholder="e.g. St. Andrews Academy" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition-all text-slate-800 font-medium">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Teacher Full Name</label>
-                        <input type="text" id="teacherNameIn" placeholder="e.g. Dr. Sarah Jenkins" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition-all text-slate-800 font-medium">
-                    </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Teacher Full Name</label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input 
+                      type="text" 
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      placeholder="Full Name"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Logo Upload */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2">School Logo</label>
+                  <div className="relative group flex items-center justify-center h-32 border-2 border-dashed border-slate-200 rounded-xl hover:border-indigo-400 hover:bg-indigo-50/30 transition-all cursor-pointer overflow-hidden">
+                    {logo ? (
+                      <img src={logo} alt="Logo" className="w-full h-full object-contain p-2" />
+                    ) : (
+                      <div className="text-center">
+                        <Upload className="mx-auto h-6 w-6 text-slate-400 group-hover:text-indigo-500" />
+                        <span className="text-[10px] text-slate-500 font-medium">Click to Upload Logo</span>
+                      </div>
+                    )}
+                    <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => handleFileUpload(e, setLogo)} accept="image/*" />
+                  </div>
                 </div>
 
-                <div class="flex flex-col gap-3 pt-4">
-                    <button onclick="refreshData()" class="group flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white py-4 rounded-2xl font-bold transition-all transform active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                        Regenerate Meta Details
-                    </button>
-                    <!-- Updated to Download as PDF -->
-                    <button id="downloadBtn" onclick="exportToPdf()" class="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-bold shadow-lg shadow-indigo-200 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <svg id="downloadIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                        <span id="btnText">Download as PDF</span>
-                    </button>
+                {/* Profile Photo Upload */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Profile Photo</label>
+                  <div className="relative group flex items-center justify-center h-32 border-2 border-dashed border-slate-200 rounded-xl hover:border-indigo-400 hover:bg-indigo-50/30 transition-all cursor-pointer overflow-hidden">
+                    {teacherPhoto ? (
+                      <img src={teacherPhoto} alt="Teacher" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="text-center">
+                        <ImageIcon className="mx-auto h-6 w-6 text-slate-400 group-hover:text-indigo-500" />
+                        <span className="text-[10px] text-slate-500 font-medium">Click to Upload Photo</span>
+                      </div>
+                    )}
+                    <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => handleFileUpload(e, setTeacherPhoto)} accept="image/*" />
+                  </div>
                 </div>
+              </div>
+
+              <div className="pt-2">
+                <button 
+                  onClick={generateRandomDetails}
+                  className="w-full flex items-center justify-center gap-2 bg-slate-800 text-white font-semibold py-3 rounded-xl hover:bg-slate-900 transition-colors shadow-lg shadow-slate-200"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Regenerate ID & Subject
+                </button>
+              </div>
             </div>
-        </div>
+          </div>
 
-        <!-- ID Card Preview -->
-        <div class="sticky top-12 flex flex-col items-center">
-            <p class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-6">Real-time Preview</p>
+          {/* Preview Section */}
+          <div className="flex flex-col items-center">
+            <h2 className="text-xl font-semibold mb-6 self-start text-slate-700">Live Preview</h2>
             
-            <div id="captureArea">
-                <div id="mainCard" class="id-card-modern">
-                    <div class="card-top-accent flex flex-col items-center pt-8 px-6 text-center">
-                        <div class="card-bg-pattern"></div>
-                        <div class="absolute top-6 right-6 w-12 h-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center overflow-hidden p-2 border border-white/20">
-                            <img id="prevSchoolLogo" src="" class="hidden max-w-full max-h-full object-contain">
-                            <svg id="defSchoolIcon" class="w-6 h-6 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                        </div>
-                        <h2 id="prevSchoolName" class="text-white text-sm font-extrabold uppercase tracking-widest leading-tight mt-2 opacity-90">Your Institution Name</h2>
-                    </div>
-
-                    <div class="profile-hex-wrap">
-                        <div class="profile-img-container">
-                            <img id="prevTeacherPhoto" src="" class="hidden">
-                            <div id="defUserIcon" class="w-full h-full flex items-center justify-center bg-slate-200 text-slate-400">
-                                <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="px-8 pt-4">
-                        <div class="text-center mb-6">
-                            <h3 id="prevTeacherName" class="text-2xl font-extrabold text-slate-900 leading-none mb-2">Teacher Name</h3>
-                            <div class="inline-block px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-wider" id="prevSubject">Mathematics Faculty</div>
-                        </div>
-                        <div class="chip-mockup"><div class="chip-lines"></div></div>
-                        <div class="grid grid-cols-2 gap-y-6 gap-x-4 mt-8">
-                            <div>
-                                <p class="label-text">Employee ID</p>
-                                <p id="prevIdNum" class="value-text mono-id">STA-882910</p>
-                            </div>
-                            <div>
-                                <p class="label-text">Blood Group</p>
-                                <p id="prevBlood" class="value-text">O-Positive</p>
-                            </div>
-                            <div>
-                                <p class="label-text">Valid Until</p>
-                                <p class="value-text">Dec 2030</p>
-                            </div>
-                            <div class="flex justify-end items-end">
-                                <div class="w-12 h-12 bg-slate-100 p-1 rounded-md border border-slate-200">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400">
-                                        <path d="M3 3h4v4H3V3zM17 3h4v4h-4V3zM3 17h4v4H3v-4zM14 14h2v2h-2v-2zM18 18h2v2h-2v-2zM14 18h2v2h-2v-2zM18 14h2v2h-2v-2z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="absolute bottom-0 w-full py-4 bg-slate-50 border-t border-slate-100 px-8 flex justify-between items-center">
-                        <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Digital Authentication System</span>
-                        <div class="flex gap-1">
-                            <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-                            <div class="w-2 h-2 rounded-full bg-slate-300"></div>
-                        </div>
-                    </div>
+            {/* The ID Card */}
+            <div 
+              ref={cardRef}
+              className="w-[350px] h-[500px] bg-white rounded-[2.5rem] overflow-hidden shadow-2xl relative border border-slate-200 flex flex-col"
+              style={{ background: 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)' }}
+            >
+              {/* Header Design */}
+              <div className="h-32 bg-indigo-600 p-6 relative">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-bl-full transform translate-x-12 -translate-y-12 blur-sm"></div>
+                <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-tr-full"></div>
+                
+                <div className="relative flex justify-between items-start gap-3">
+                  <div className="flex-1">
+                    <h3 className="text-white font-extrabold text-sm leading-tight uppercase tracking-widest line-clamp-2">
+                      {schoolName || 'Your School Name'}
+                    </h3>
+                    <div className="w-8 h-1 bg-white/40 mt-2 rounded-full"></div>
+                  </div>
+                  
+                  {/* Logo Container at Top Right */}
+                  <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center p-1.5 shrink-0 overflow-hidden">
+                    {logo ? (
+                      <img src={logo} alt="School Logo" className="w-full h-full object-contain" />
+                    ) : (
+                      <School className="w-8 h-8 text-indigo-600" />
+                    )}
+                  </div>
                 </div>
+              </div>
+
+              {/* Profile Photo Section */}
+              <div className="flex flex-col items-center -mt-14 px-8 pb-6 flex-1">
+                <div className="w-32 h-32 bg-white p-2 rounded-3xl shadow-2xl z-10">
+                  <div className="w-full h-full bg-slate-100 rounded-2xl flex items-center justify-center overflow-hidden border border-slate-50">
+                    {teacherPhoto ? (
+                      <img src={teacherPhoto} alt="Teacher Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-20 h-20 text-slate-300" />
+                    )}
+                  </div>
+                </div>
+
+                <div className="text-center mt-5">
+                  <h4 className="text-xl font-black text-indigo-950 uppercase tracking-tight">{fullName || 'Teacher Name'}</h4>
+                  <p className="text-indigo-600 text-[10px] font-black uppercase tracking-[0.2em] mt-1 opacity-70">Official Faculty ID</p>
+                </div>
+
+                {/* Details Grid */}
+                <div className="mt-8 w-full grid grid-cols-2 gap-y-6 gap-x-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 bg-indigo-50 rounded-lg shrink-0 border border-indigo-100">
+                      <Hash className="w-3.5 h-3.5 text-indigo-600" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] uppercase text-slate-400 font-black leading-none mb-1 tracking-wider">ID Number</p>
+                      <p className="text-[11px] font-bold text-slate-800">{idDetails.idNumber}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 bg-indigo-50 rounded-lg shrink-0 border border-indigo-100">
+                      <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] uppercase text-slate-400 font-black leading-none mb-1 tracking-wider">Subject</p>
+                      <p className="text-[11px] font-bold text-slate-800">{idDetails.subject}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 bg-indigo-50 rounded-lg shrink-0 border border-indigo-100">
+                      <Calendar className="w-3.5 h-3.5 text-indigo-600" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] uppercase text-slate-400 font-black leading-none mb-1 tracking-wider">Valid Till</p>
+                      <p className="text-[11px] font-bold text-slate-800">Dec 2030</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 bg-indigo-50 rounded-lg shrink-0 border border-indigo-100">
+                      <Droplets className="w-3.5 h-3.5 text-indigo-600" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] uppercase text-slate-400 font-black leading-none mb-1 tracking-wider">Blood Group</p>
+                      <p className="text-[11px] font-bold text-slate-800">{idDetails.bloodGroup}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Decorative Footer */}
+              <div className="h-4 flex">
+                <div className="flex-1 bg-indigo-600"></div>
+                <div className="flex-1 bg-slate-800"></div>
+                <div className="flex-1 bg-indigo-400"></div>
+              </div>
             </div>
-            
-            <p class="mt-8 text-slate-400 text-xs font-medium">Card size standardized for CR80 printing.</p>
+
+            <button 
+              onClick={downloadIDCard}
+              className="mt-8 w-full md:w-auto flex items-center justify-center gap-3 bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-95"
+            >
+              <Download className="w-5 h-5" />
+              Download ID Card
+            </button>
+            <p className="text-[10px] text-slate-400 mt-4 uppercase tracking-[0.3em] font-bold">Standard CR80 Dimension</p>
+          </div>
         </div>
+      </div>
     </div>
+  );
+};
 
-    <script>
-        const subjectPool = ["Natural Sciences", "Advanced Mathematics", "English Literature", "Physical Education", "Fine Arts", "World History", "Computer Engineering", "Global Economics", "Applied Physics", "Chemistry"];
-        const bloodPool = ["A+ (Positive)", "B+ (Positive)", "AB+ (Positive)", "O+ (Positive)", "A- (Negative)", "B- (Negative)", "O- (Negative)"];
-
-        function handleImage(inputId, displayId, fallbackId) {
-            document.getElementById(inputId).addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const img = document.getElementById(displayId);
-                        img.src = event.target.result;
-                        img.classList.remove('hidden');
-                        if(fallbackId) document.getElementById(fallbackId).classList.add('hidden');
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-
-        handleImage('schoolLogoIn', 'prevSchoolLogo', 'defSchoolIcon');
-        handleImage('teacherPhotoIn', 'prevTeacherPhoto', 'defUserIcon');
-
-        document.getElementById('schoolNameIn').addEventListener('input', e => {
-            document.getElementById('prevSchoolName').innerText = e.target.value || "Your Institution Name";
-        });
-        document.getElementById('teacherNameIn').addEventListener('input', e => {
-            document.getElementById('prevTeacherName').innerText = e.target.value || "Teacher Name";
-        });
-
-        function refreshData() {
-            const randomID = "EDU-" + Math.floor(100000 + Math.random() * 900000);
-            const randomSub = subjectPool[Math.floor(Math.random() * subjectPool.length)];
-            const randomBlood = bloodPool[Math.floor(Math.random() * bloodPool.length)];
-
-            document.getElementById('prevIdNum').innerText = randomID;
-            document.getElementById('prevSubject').innerText = randomSub;
-            document.getElementById('prevBlood').innerText = randomBlood;
-        }
-
-        async function exportToPdf() {
-            const btn = document.getElementById('downloadBtn');
-            const btnText = document.getElementById('btnText');
-            const originalText = btnText.innerText;
-            
-            btn.disabled = true;
-            btnText.innerText = "Creating PDF...";
-
-            try {
-                // Ensure fonts and images are loaded
-                await document.fonts.ready;
-                
-                const element = document.getElementById('mainCard');
-                
-                // Capture the card with high resolution
-                const canvas = await html2canvas(element, {
-                    scale: 3, // Balanced for quality vs size on mobile
-                    backgroundColor: "#ffffff",
-                    useCORS: true,
-                    logging: false
-                });
-
-                const imgData = canvas.toDataURL('image/jpeg', 0.95);
-                
-                // Initialize jsPDF
-                const { jsPDF } = window.jspdf;
-                // Standard ID Card Size: 85.6mm x 53.98mm
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: [54, 85.6] // Fits the ID card exactly
-                });
-
-                // Add the captured image to the PDF (coordinates 0,0)
-                pdf.addImage(imgData, 'JPEG', 0, 0, 85.6, 54);
-                
-                const teacherName = document.getElementById('prevTeacherName').innerText.trim().replace(/\s+/g, '_');
-                pdf.save(`Teacher_ID_${teacherName || 'Card'}.pdf`);
-                
-                btnText.innerText = "Done!";
-                setTimeout(() => {
-                    btnText.innerText = originalText;
-                    btn.disabled = false;
-                }, 2000);
-
-            } catch (err) {
-                console.error("PDF Generation Error:", err);
-                btnText.innerText = "Failed";
-                setTimeout(() => {
-                    btnText.innerText = originalText;
-                    btn.disabled = false;
-                }, 3000);
-            }
-        }
-
-        window.onload = refreshData;
-    </script>
-</body>
-</html>
+export default App;
 
